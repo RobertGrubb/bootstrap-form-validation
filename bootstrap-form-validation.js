@@ -60,10 +60,15 @@ const BootstrapValidation = {
      * and does validation based on it.
      */
     for (let i = 0; i < validationRules.length; i++) {
-      /**
-       * If the value is required
-       */
-      if (validationRules[i] === "required") {
+      if (validationRules[i] === "trim") {
+        /**
+         * Trim the value of the element and update it.
+         */
+        el.val(el.val().trim());
+      } else if (validationRules[i] === "required") {
+        /**
+         * If it does not have a value, return invalid.
+         */
         if (!el.val()) {
           errors.push(`${el.attr("name") ? el.attr("name") : "This field"} is required`);
           valid = false;
@@ -80,11 +85,16 @@ const BootstrapValidation = {
         /**
          * If the validation is a minimum number of characters
          */
-      } else if (validationRules[i].includes("min")) {
+      } else if (validationRules[i] === "number") {
+        if (isNaN(el.val()) === true) {
+          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be a number.`);
+          valid = false;
+        }
+      } else if (validationRules[i].includes("min_length")) {
         const parts = validationRules[i].split(":");
 
         if (parts.length !== 2) {
-          console.log("Min and max should only have to parameters (ex min:12)");
+          console.log("Min length and max length should only have to parameters (ex min:12)");
           continue;
         }
 
@@ -92,11 +102,11 @@ const BootstrapValidation = {
           errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be atleast ${parts[1]} characters.`);
           valid = false;
         }
-      } else if (validationRules[i].includes("max")) {
+      } else if (validationRules[i].includes("max_length")) {
         const parts = validationRules[i].split(":");
 
         if (parts.length !== 2) {
-          console.log("Min and max should only have to parameters (ex min:12)");
+          console.log("Min length and max length should only have to parameters (ex min:12)");
           continue;
         }
 
