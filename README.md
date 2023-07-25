@@ -87,7 +87,7 @@ data-validate-validation="email"
 Requires the input to be a minimum amount of characters.
 
 ```
-data-validate-validation="min_length:5"
+data-validate-validation="min_length[5]"
 ```
 
 ### Maximum length
@@ -95,7 +95,7 @@ data-validate-validation="min_length:5"
 Requires the input to be equal to or less than a number of characters.
 
 ```
-data-validate-validation="max_length:12"
+data-validate-validation="max_length[12]"
 ```
 
 ### Number
