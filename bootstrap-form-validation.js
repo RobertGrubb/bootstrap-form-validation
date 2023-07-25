@@ -8,6 +8,19 @@
  */
 
 const BootstrapValidation = {
+  utilities: {
+    capitalizeFirstLetter: (string) => {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    bracketValue: (string) => {
+      let matches = string.match(/\[(.*?)\]/);
+      if (!matches) {
+        return false;
+      }
+      return matches[1];
+    },
+  },
+
   /**
    * Returns whether a string is a valid email
    * address.
@@ -55,6 +68,8 @@ const BootstrapValidation = {
     const errors = [];
     let valid = true;
 
+    const fieldName = el.attr("name") ? BootstrapValidation.utilities.capitalizeFirstLetter(el.attr("name").replace("_", " ")) : "This field";
+
     /**
      * Iterates through the validation rules
      * and does validation based on it.
@@ -67,11 +82,21 @@ const BootstrapValidation = {
         el.val(el.val().trim());
       } else if (validationRules[i] === "required") {
         /**
-         * If it does not have a value, return invalid.
+         * If this is a checkbox, make sure it is checked if required.
          */
-        if (!el.val()) {
-          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} is required`);
-          valid = false;
+        if (el.attr("type") == "checkbox") {
+          if (!el.is(":checked")) {
+            errors.push(`${fieldName} is required`);
+            valid = false;
+          }
+        } else {
+          /**
+           * If it does not have a value, return invalid.
+           */
+          if (!el.val()) {
+            errors.push(`${fieldName} is required`);
+            valid = false;
+          }
         }
 
         /**
@@ -79,7 +104,7 @@ const BootstrapValidation = {
          */
       } else if (validationRules[i] === "email") {
         if (!BootstrapValidation.validateEmail(el.val())) {
-          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be a valid email address.`);
+          errors.push(`${fieldName} must be a valid email address.`);
           valid = false;
         }
         /**
@@ -87,31 +112,71 @@ const BootstrapValidation = {
          */
       } else if (validationRules[i] === "number") {
         if (isNaN(el.val()) === true) {
-          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be a number.`);
+          errors.push(`${fieldName} must be a number.`);
+          valid = false;
+        }
+      } else if (validationRules[i].includes("matches")) {
+        /**
+         * During the match validation rule, the identifier of the
+         * input element loads the element, checks the value against the current
+         * element's value, then returns valid or not.
+         */
+
+        /**
+         * Get the bracket value
+         */
+        const bracketValue = BootstrapValidation.utilities.bracketValue(validationRules[i]);
+        if (!bracketValue) {
+          console.log("Matches validation requires an input element identifier (matches[#inputId])");
+          continue;
+        }
+
+        /**
+         * Get the matching element and make sure it exists
+         */
+        const matchingElement = $(bracketValue);
+        if (!matchingElement.length) {
+          console.log("Matches validation failed to run because the specified element does not exist.");
+          continue;
+        }
+
+        /**
+         * Setup matching element variables.
+         */
+        const matchingElementValue = matchingElement.val();
+        if (!matchingElement.attr("name")) {
+          console.log("Matches validation failed because the matching element does not have a name attribute.");
+          continue;
+        }
+
+        const matchingElementName = BootstrapValidation.utilities.capitalizeFirstLetter(matchingElement.attr("name").replace("_", " "));
+
+        if (el.val() !== matchingElementValue) {
+          errors.push(`${fieldName} must match ${matchingElementName}`);
           valid = false;
         }
       } else if (validationRules[i].includes("min_length")) {
-        const parts = validationRules[i].split(":");
+        const bracketValue = BootstrapValidation.utilities.bracketValue(validationRules[i]);
 
-        if (parts.length !== 2) {
-          console.log("Min length and max length should only have to parameters (ex min:12)");
+        if (!bracketValue) {
+          console.log("Min length and max length should only have to parameters (ex min_length[2])");
           continue;
         }
 
-        if (el.val().length < parseInt(parts[1])) {
-          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be atleast ${parts[1]} characters.`);
+        if (el.val().length < parseInt(bracketValue)) {
+          errors.push(`${fieldName} must be atleast ${bracketValue} characters.`);
           valid = false;
         }
       } else if (validationRules[i].includes("max_length")) {
-        const parts = validationRules[i].split(":");
+        const bracketValue = BootstrapValidation.utilities.bracketValue(validationRules[i]);
 
-        if (parts.length !== 2) {
-          console.log("Min length and max length should only have to parameters (ex min:12)");
+        if (!bracketValue) {
+          console.log("Min length and max length should only have to parameters (ex min_length[2])");
           continue;
         }
 
-        if (el.val().length > parseInt(parts[1])) {
-          errors.push(`${el.attr("name") ? el.attr("name") : "This field"} must be equal to or less than ${parts[1]} characters.`);
+        if (el.val().length > parseInt(bracketValue)) {
+          errors.push(`${fieldName} must be equal to or less than ${bracketValue} characters.`);
           valid = false;
         }
       }
@@ -202,6 +267,8 @@ $(function () {
 
     // Get the elements in the form that require validation
     const elements = $(this).find("*[data-validate-validation]").toArray();
+
+    console.log(elements);
 
     /**
      * Iterate through the element and validate

@@ -13,6 +13,7 @@ Frontend UI form validation with Bootstrap or MDBootstrap. This library allows y
   - [Minimum Length](#minimum-length)
   - [Maximum Length](#maximum-length)
   - [Number](#number)
+  - [Matches](#matches)
 - [Multiple Validations at Once](#multiple-validations-at-once)
 - [Simple Example](#simple-example)
 
@@ -103,6 +104,14 @@ Requires the value to be a number.
 
 ```
 data-validate-validation="number"
+```
+
+### Matches
+
+Requires the value of the input to match another input's value. (Example: password and confirm password)
+
+```
+data-validate-validation="required|matches[#inputId]"
 ```
 
 ---
