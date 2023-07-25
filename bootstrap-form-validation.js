@@ -19,6 +19,15 @@ const BootstrapValidation = {
       }
       return matches[1];
     },
+    findPosition: (obj) => {
+      var currenttop = -130;
+      if (obj.offsetParent) {
+        do {
+          currenttop += obj.offsetTop;
+        } while ((obj = obj.offsetParent));
+        return [currenttop];
+      }
+    },
   },
 
   /**
@@ -256,8 +265,6 @@ $(function () {
    * On a form submit,
    */
   window.$('[data-validate-on-submit="true"], [data-validate-on-blur="true"]').on("submit", function (e) {
-    console.log("test");
-
     // Prevent the default submission
     e.preventDefault();
 
@@ -267,8 +274,6 @@ $(function () {
 
     // Get the elements in the form that require validation
     const elements = $(this).find("*[data-validate-validation]").toArray();
-
-    console.log(elements);
 
     /**
      * Iterate through the element and validate
@@ -305,6 +310,10 @@ $(function () {
         $(elements[i]).removeClass("is-invalid");
         $(elements[i]).parent().find(".invalid-feedback").remove();
       }
+    }
+
+    if ($(this).data("validate-scroll-on-fail")) {
+      window.scroll(0, BootstrapValidation.utilities.findPosition(this));
     }
 
     /**

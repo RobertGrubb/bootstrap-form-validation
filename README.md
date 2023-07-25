@@ -15,6 +15,7 @@ Frontend UI form validation with Bootstrap or MDBootstrap. This library allows y
   - [Number](#number)
   - [Matches](#matches)
 - [Multiple Validations at Once](#multiple-validations-at-once)
+- [Scroll on Validation Fail](#scroll-on-validation-fail)
 - [Simple Example](#simple-example)
 
 ## Usage
@@ -122,6 +123,14 @@ You may run multiple validations on an input like so:
 
 ```
 data-validate-validation="trim|required|email"
+```
+
+## Scroll on Validation Fail
+
+Sometimes we may want the page to scroll to the top of the form when validation fails. To do this, simply add the following to the form element as an attribute:
+
+```
+data-validate-scroll-on-fail="true"
 ```
 
 ## Simple Example
